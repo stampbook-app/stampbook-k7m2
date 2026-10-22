@@ -1,0 +1,14 @@
+{
+  "name": "Stampbook",
+  "short_name": "Stampbook",
+  "description": "Travel planner and budget tracker: plan trips, log spending and know what you can spend today.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FBF5F2",
+  "theme_color": "#FBF5F2",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
