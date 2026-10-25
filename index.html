@@ -892,6 +892,44 @@ button.li:hover{background:none}
 .tabbar.scroll{justify-content:flex-start;overflow-x:auto;scrollbar-width:none;-webkit-mask:linear-gradient(90deg,#000 88%,transparent);mask:linear-gradient(90deg,#000 88%,transparent)}
 .tabbar.scroll::-webkit-scrollbar{display:none}
 .tabbar.scroll button{flex:none;min-width:66px}
+
+/* free demo: sticky ribbon, welcome sheet, 60-second tour, demo vs full */
+.demobar{position:sticky;top:8px;z-index:25;display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:8px 8px 8px 10px;background:var(--ink);color:var(--bg);border-radius:16px;font-size:13.5px;line-height:1.3;box-shadow:0 8px 22px rgba(0,0,0,.16)}
+.demobar .grow{min-width:0;flex:1}
+.demobar .btn{flex:none;white-space:nowrap}
+.dstamp{display:inline-block;flex:none;font-family:"Courier Prime",ui-monospace,monospace;font-weight:700;font-size:11px;letter-spacing:.14em;padding:4px 7px 3px;border:2px solid currentColor;border-radius:4px;transform:rotate(-3deg);color:var(--coral)}
+.demobar .dstamp{color:#F3C76B}
+.demotour{border:2px solid var(--coral);background:linear-gradient(180deg,var(--coral-soft),var(--paper) 140px)}
+.dt-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dt-head b{font-size:18px;flex:1;white-space:nowrap}
+.dt-bar{height:8px;border-radius:8px;background:color-mix(in srgb,var(--coral) 18%,transparent);overflow:hidden}
+.dt-bar i{display:block;height:100%;background:var(--coral);border-radius:8px;transition:width .4s}
+.dt-steps{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.dt-steps li{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 10px 10px 12px}
+.dt-steps li .grow{flex:1;min-width:0}
+.dt-steps li b{display:block}
+.dt-steps li span:not(.dt-n){font-size:13.5px;color:var(--muted)}
+.dt-steps li.ok{opacity:.7}
+.dt-steps li.ok b{text-decoration:line-through}
+.dt-n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--coral-soft);color:var(--coral)}
+.dt-steps li.ok .dt-n{background:var(--coral);color:#fff}
+.demotour.done{text-align:left}
+.demotour.done h2{font-size:22px}
+.demowel h2{font-size:26px;line-height:1.15;margin:14px 0 8px}
+.demowel .dstamp{font-size:12px}
+.dw-perks{list-style:none;padding:0;margin:14px 0 18px;display:grid;gap:10px}
+.dw-perks li{display:flex;align-items:center;gap:12px;font-weight:600}
+.dw-perks .mi{width:40px;height:40px;border-radius:12px;background:var(--coral-soft);color:var(--coral);display:grid;place-items:center;flex:none}
+.dw-perks .mi .ico{width:22px;height:22px}
+.dtable{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:14px}
+.dtable th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;padding:6px}
+.dtable th:last-child,.dtable td:last-child{background:var(--coral-soft);color:var(--ink)}
+.dtable td{padding:9px 8px;border-top:1px solid var(--line)}
+.dtable td+td{text-align:center;font-weight:700;width:76px}
+.dt-why{margin:0 0 16px 18px;display:grid;gap:4px;font-size:14px}
+.pulse{animation:sbpulse 1.2s ease-out 3}
+@keyframes sbpulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--coral) 60%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+@media (max-width:420px){.demobar .hide-s{display:none}}
 </style>
 
 <div class="app">
@@ -1338,7 +1376,7 @@ function render(){
   renderNav();
   const v=document.getElementById('view');
   const views=PROJ?{today:viewTodayP,dash:viewDash,board:viewBoardP,money:viewMoneyP,more:viewMoreP,project:viewProjectP,projects:viewProjects,clients:viewClients,timeline:viewTimelineP,matrix:viewMatrixP,pcal:viewPCal,cats:viewCats,settings:viewSettings}:BUDGET?{today:viewTodayB,month:viewMonthB,bills:viewBills,goals:viewGoalsB,more:viewMoreB,spending:viewSpending,income:viewIncome,debt:viewDebt,milestones:viewMilestones,dump:viewDump,cats:viewCats,settings:viewSettings}:{today:viewToday,month:viewMonth,trips:viewTrips,trip:viewTrip,money:viewMoney,map:viewMap,year:viewYear,settings:viewSettings,more:viewMore,cats:viewCats,memories:viewMemories};
-  v.innerHTML=(views[V.tab]||viewToday)();
+  v.innerHTML=demoBar()+(views[V.tab]||viewToday)();
   v.classList.toggle('wide',PROJ&&['dash','board','project','timeline','pcal'].includes(V.tab));
   applyTheme();
   if(v.querySelector('img[data-photo]')) loadPhotos();
@@ -3088,7 +3126,8 @@ function toast(msg,undo){
 }
 function snapshot(){return JSON.stringify(S)}
 function commit(msg,undoSnap){save(); render(); if(msg) toast(msg,!!undoSnap); if(undoSnap) V.undo=undoSnap}
-function leaveSample(){ if(S.sample){S.sample=false} }
+// in the free demo, changing the example still counts as playing with it, so the tour stays
+function leaveSample(){ if(S.sample){S.sample=false; if(PRODUCT.demo) S.demoEx=true} }
 const inFrame=(()=>{try{return window.self!==window.top}catch(e){return true}})();
 function download(name,text,type){
   if(inFrame) return false; /* preview frames block downloads; the hosted app runs top-level */
@@ -3142,7 +3181,7 @@ document.addEventListener('click',e=>{
     return;
   }
   const go=e.target.closest('[data-go]');
-  if(go){V.tab=go.dataset.go; V.confirm=null; closeDlg(); render(); window.scrollTo(0,0); return}
+  if(go){demoTrack('go:'+go.dataset.go); V.tab=go.dataset.go; V.confirm=null; closeDlg(); render(); window.scrollTo(0,0); return}
   const op=e.target.closest('[data-open]');
   if(op){V.tab='trip'; if(V.trip!==op.dataset.open) V.tripTab='overview'; V.trip=op.dataset.open; V.confirm=null;
     if(op.dataset.tab) V.tripTab=op.dataset.tab; if(op.dataset.focus==='spend') V.tripTab='money'; if(op.dataset.focus==='todo') V.tripTab='pack';
@@ -3151,6 +3190,7 @@ document.addEventListener('click',e=>{
     if(op.dataset.focus==='todo'){const c=document.getElementById('todocard'); if(c) c.scrollIntoView({block:'start'})} return}
   const b=e.target.closest('[data-act]'); if(!b) return;
   const act=b.dataset.act, id=b.dataset.id;
+  demoTrack('act:'+act); if(PRODUCT.demo&&demoAct(act,b)) return;
   if((act.startsWith('sync-')||act.startsWith('care-'))&&syncAct(act,b)) return;
   if(!['wipe','debt-del','acc-del','del-trip','del-booking','del-place','del-spot','del-tx','del-goal','del-rec','cat-del','del-spend-x'].includes(act)) V.confirm=null;
   if(BUDGET&&budgetAct(act,b,id)) return;
@@ -3335,6 +3375,7 @@ document.addEventListener('submit',e=>{
   const fd=new FormData(f), val=k=>(fd.get(k)||'').toString().trim();
   const err=f.querySelector('[data-err]'); const fail=m=>{if(err){err.textContent=m;err.hidden=false}};
   const kind=f.dataset.form;
+  demoTrack('form:'+kind);
   if(BUDGET&&budgetSubmit(kind,f,fd,val,fail)) return;
   if(PROJ&&projSubmit(kind,f,fd,val,fail)) return;
   if(kind==='sync-join'){joinSubmit(val('code')).then(m=>{if(m) fail(m)}); return}
@@ -3899,11 +3940,12 @@ function installHow(){
     <p class="muted" style="font-size:14px">Safari deletes a website’s saved data after about a week of not opening it. An app on your Home Screen or Dock is not deleted.</p><div class="row-end"><button class="btn coral" data-act="close">Got it</button></div>`);
 }
 function careCards(){
+  if(PRODUCT.demo) return '';
   const c=lsGet(CARE,{}), now=Date.now();
   if(needsInstall()&&!(c.installLater>now)) return `<div class="card care"><div><b>This copy is open in Safari.</b><p class="muted">Safari deletes a website’s saved data after about a week of not opening it. Adding ${PRODUCT.name} to your ${isIOS?'Home Screen':'Dock'} stops that.</p></div>
     <div class="row-end" style="justify-content:flex-start"><button class="btn small coral" data-act="care-install">Show me how</button><button class="btn small ghost" data-act="care-later" data-k="installLater">Later</button></div></div>`;
-  const enough=!S.sample&&(S.trips.length+S.tx.length)>=5;
-  if(enough&&!syncOn()&&(!c.lastBackup||now-c.lastBackup>30*864e5)&&!(c.backupLater>now)) return `<div class="card care"><div><b>${c.lastBackup?'Time for a fresh backup':'Keep your planner safe'}</b><p class="muted">Your trips live in this browser, and a browser can clear its storage. Keep an encrypted recovery copy, or download a backup file.</p></div>
+  const enough=!S.sample&&(S.trips.length+S.tx.length+S.tasks.length)>=5;
+  if(enough&&!syncOn()&&(!c.lastBackup||now-c.lastBackup>30*864e5)&&!(c.backupLater>now)) return `<div class="card care"><div><b>${c.lastBackup?'Time for a fresh backup':'Keep your planner safe'}</b><p class="muted">${BUDGET?'Your budget lives in this browser, and a browser can clear its storage. Keep an encrypted recovery copy, or download a backup file.':PROJ?'Your projects live in this browser, and a browser can clear its storage. Keep an encrypted recovery copy, or download a backup file.':'Your trips live in this browser, and a browser can clear its storage. Keep an encrypted recovery copy, or download a backup file.'}</p></div>
     <div class="row-end" style="justify-content:flex-start">${syncUrl()?'<button class="btn small coral" data-act="sync-recovery">Keep a recovery copy</button>':''}<button class="btn small ${syncUrl()?'ghost':'coral'}" data-act="dl-json">Download a backup</button><button class="btn small ghost" data-act="care-later" data-k="backupLater">Later</button></div></div>`;
   return '';
 }
@@ -4170,7 +4212,8 @@ function budgetMilestones(){
 
 /* ---------- views ---------- */
 function budgetBanner(){
-  if(!S.sample) return PRODUCT.demo?`<div class="banner demo"><div><b>Demo version</b><p>Everything works. The demo keeps ${DEMO_LIMIT} spends, and the full planner adds Home Screen, offline and syncing.</p></div></div>`:'';
+  if(PRODUCT.demo&&(S.sample||S.demoEx)) return demoBanner();
+  if(!S.sample) return PRODUCT.demo?`<div class="banner demo"><div><b>Demo version</b><p>Everything works. The demo keeps ${DEMO_LIMIT} spends, and the full planner adds Home Screen, offline and syncing.</p></div><div class="acts"><button class="btn small coral" data-act="demo-get">Get the full app</button></div></div>`:'';
   return `<div class="banner"><div><b>You're looking at an example budget.</b><p>These numbers belong to Alex, a made-up person. Try anything; nothing here is yours yet.</p></div>
   <div class="acts"><button class="btn small" data-act="start-own">Start my own</button>${syncUrl()?'<button class="btn small ghost" data-act="sync-recover">Get my numbers back</button>':''}</div></div>`;
 }
@@ -4469,7 +4512,7 @@ function demoDialog(){
   openDlg(`<div class="dlg-head"><h2>The demo is full</h2><button class="iconbtn" data-act="close" aria-label="Close">×</button></div>
     <p>The demo keeps ${DEMO_LIMIT} spends. Everything else keeps working, so look around as much as you like.</p>
     <p class="muted" style="font-size:14px">The full ${esc(PRODUCT.name)} has no limit, adds to your Home Screen, works offline and syncs between your phone, tablet and computer.</p>
-    <div class="row-end"><button class="btn ghost" data-act="close">Not now</button><a class="btn coral" href="${esc(PRODUCT.shop||'https://www.etsy.com/shop/StampbookApp')}" target="_blank" rel="noopener">See the full version</a></div>`);
+    <div class="row-end"><button class="btn ghost" data-act="close">Not now</button><button class="btn coral" data-act="demo-get">See the full version</button></div>`);
 }
 function recFormB(r,type){
   const isNew=!r; type=r?r.type:type||'out';
@@ -4724,7 +4767,8 @@ function pStopTimer(){
 
 /* ---------- shared bits ---------- */
 function projBanner(){
-  if(!S.sample) return PRODUCT.demo?`<div class="banner demo"><div><b>Demo version</b><p>Everything works. The demo keeps ${DEMO_LIMIT} tasks you add, and the full app adds Home Screen, offline and syncing.</p></div></div>`:'';
+  if(PRODUCT.demo&&(S.sample||S.demoEx)) return demoBanner();
+  if(!S.sample) return PRODUCT.demo?`<div class="banner demo"><div><b>Demo version</b><p>Everything works. The demo keeps ${DEMO_LIMIT} tasks you add, and the full app adds Home Screen, offline and syncing.</p></div><div class="acts"><button class="btn small coral" data-act="demo-get">Get the full app</button></div></div>`:'';
   return `<div class="banner"><div><b>You're looking at example projects.</b><p>These belong to Nina, a made-up designer. Try anything; nothing here is yours yet.</p></div>
   <div class="acts"><button class="btn small" data-act="start-own">Start my own</button>${syncUrl()?'<button class="btn small ghost" data-act="sync-recover">Get my numbers back</button>':''}</div></div>`;
 }
@@ -4733,7 +4777,7 @@ function pDemoDialog(){
   openDlg(`<div class="dlg-head"><h2>The demo is full</h2><button class="iconbtn" data-act="close" aria-label="Close">×</button></div>
     <p>The demo keeps ${DEMO_LIMIT} tasks. Everything else keeps working, so look around as much as you like.</p>
     <p class="muted" style="font-size:14px">The full ${esc(PRODUCT.name)} has no limit, adds to your Home Screen, works offline and syncs between your devices.</p>
-    <div class="row-end"><button class="btn ghost" data-act="close">Not now</button><a class="btn coral" href="${esc(PRODUCT.shop||'https://www.etsy.com/shop/StampbookApp')}" target="_blank" rel="noopener">See the full version</a></div>`);
+    <div class="row-end"><button class="btn ghost" data-act="close">Not now</button><button class="btn coral" data-act="demo-get">See the full version</button></div>`);
 }
 function pTaskCard(t,showProj){
   const T=todayISO(), m=pMins(t), late=pLate(t), i=PCOLS.findIndex(c=>c[0]===t.col);
@@ -5133,7 +5177,7 @@ if(PROJ){
   document.addEventListener('dragend',e=>{document.querySelectorAll('.dragging,.dropok').forEach(x=>x.classList.remove('dragging','dropok')); dragId=null});
   document.addEventListener('dragover',e=>{const z=e.target.closest&&e.target.closest('[data-col],[data-quad]'); if(!z||!dragId) return; e.preventDefault(); document.querySelectorAll('.dropok').forEach(x=>x!==z&&x.classList.remove('dropok')); z.classList.add('dropok')});
   document.addEventListener('drop',e=>{const z=e.target.closest&&e.target.closest('[data-col],[data-quad]'); if(!z||!dragId) return; e.preventDefault(); const t=S.tasks.find(x=>x.id===dragId); if(!t) return; const before=snapshot(); leaveSample();
-    if(z.dataset.col){pMove(t,z.dataset.col); commit(`Moved to ${PCOLNAME[z.dataset.col]}`,before)} else {t.prio=z.dataset.quad; commit(QUADNAME[t.prio],before)}});
+    if(z.dataset.col){demoTrack('act:pmove'); pMove(t,z.dataset.col); commit(`Moved to ${PCOLNAME[z.dataset.col]}`,before)} else {t.prio=z.dataset.quad; commit(QUADNAME[t.prio],before)}});
   document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.pnote){const p=pProj(e.target.dataset.pnote); if(p){leaveSample(); p.notes=e.target.value; save()}}});
 }
 
@@ -5186,6 +5230,89 @@ function makeSampleP(){
   return st;
 }
 
+
+/* ---------- free demo: a welcome, a 60-second tour, and an honest way to the full app ---------- */
+const DEMO_KEY=SKP+'.demo';
+const demoState=()=>lsGet(DEMO_KEY,{});
+const demoSave=d=>{try{localStorage.setItem(DEMO_KEY,JSON.stringify(d))}catch(e){}};
+const DEMO=PROJ?{
+  who:'Nina’s example projects', play:'Nina is made up, so tap anything.', hook:'Every client, task and invoice on one page',
+  perks:[['chart','A dashboard that shows who owes you and what is late'],['kanban','A board with a “waiting on client” column'],['clock','Hours, invoices and deadlines in one place']],
+  steps:[{k:'form:pqa',t:'Add a task in one line',d:'Type “send invoice tomorrow” in the box and tap Add.',focus:'#pqa',val:'send invoice tomorrow'},
+    {k:'act:pmove',t:'Move a card',d:'On the Board, tap › on a card to send it to the next column.',go:'board'},
+    {k:'go:dash',t:'See the big picture',d:'Open the Dashboard: money owed, late work and hours.',go:'dash'}],
+  won:'One board, one dashboard, every client in one place. The full app adds your Home Screen, offline use and sync.'
+}:{
+  who:'Alex’s example budget', play:'It is all play money, so tap anything.', hook:'The budget that gives you one number',
+  perks:[['wallet','Safe to spend until payday, worked out for you'],['receipt','Bills you tick off, so nothing sneaks up'],['spark','Log a spend in one line, like “12 coffee”']],
+  steps:[{k:'form:qa',t:'Log a spend in one line',d:'Type “12 coffee” in the box and tap Go. Watch the big number change.',focus:'#qa',val:'12 coffee'},
+    {k:'act:how',t:'See how the number is made',d:'Tap “How is this worked out?” under the big number.',sel:'[data-act=how]'},
+    {k:'act:bill-pay',t:'Tick off a bill',d:'Open Bills and tap the box next to a bill.',go:'bills'}],
+  won:'One number, one line to log, bills you tick off. The full app adds your Home Screen, offline use and sync.'
+};
+function demoTrack(k){
+  if(!PRODUCT.demo) return;
+  const d=demoState(); d.done=d.done||{};
+  if(!DEMO.steps.some(s=>s.k===k)||d.done[k]) return;
+  d.done[k]=1; demoSave(d);
+  const n=DEMO.steps.filter(s=>d.done[s.k]).length;
+  setTimeout(()=>toast(n===DEMO.steps.length?'All 3 done. That is the whole idea!':`Tour step done ✓ ${n} of ${DEMO.steps.length}`),900);
+}
+function demoBar(){
+  if(!PRODUCT.demo) return '';
+  return `<div class="demobar"><span class="dstamp" data-notr>FREE DEMO</span><span class="grow"><b>Like it?</b> Pay once.<span class="hide-s"> No subscription.</span></span><button class="btn small coral" data-act="demo-get">Get the full app</button></div>`;
+}
+// the yellow "example data" banner, demo flavour: the tour on Today, one short line elsewhere
+function demoBanner(){
+  if(V.tab!=='today') return `<div class="banner demo"><div><b>Free demo · ${DEMO.who}</b><p>${DEMO.play}</p></div><div class="acts"><button class="btn small" data-act="start-own">Start my own</button></div></div>`;
+  const done=demoState().done||{}, n=DEMO.steps.filter(s=>done[s.k]).length, N=DEMO.steps.length;
+  if(n===N) return `<div class="card demotour done"><div class="dt-head"><span class="dstamp" data-notr>TOUR DONE</span></div><h2>You have seen how it works</h2><p>${DEMO.won}</p>
+    <div class="row-end" style="justify-content:flex-start"><button class="btn coral" data-act="demo-get">Get the full app</button><button class="btn ghost" data-act="start-own">Try it with my own numbers</button></div></div>`;
+  return `<div class="card demotour"><div class="dt-head"><span class="dstamp" data-notr>FREE DEMO</span><b>Try it in 60 seconds</b><span class="muted">${n} of ${N} done</span></div>
+    <div class="dt-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${N}" aria-valuenow="${n}"><i style="width:${n/N*100}%"></i></div>
+    <p class="muted" style="font-size:14px">This is the real app with ${DEMO.who}. ${DEMO.play}</p>
+    <ol class="dt-steps">${DEMO.steps.map((s,i)=>`<li class="${done[s.k]?'ok':''}"><span class="dt-n" aria-hidden="true">${done[s.k]?'✓':i+1}</span><div class="grow"><b>${s.t}</b><span>${s.d}</span></div>${done[s.k]?'':`<button class="btn small" data-act="demo-show" data-i="${i}">Show me</button>`}</li>`).join('')}</ol>
+    <div class="row-end" style="justify-content:flex-start"><button class="btn small ghost" data-act="start-own">Try it with my own numbers</button></div></div>`;
+}
+function demoWelcome(){
+  const d=demoState(); d.seen=1; demoSave(d);
+  openDlg(`<div class="demowel"><div class="row-between"><span class="dstamp" data-notr>FREE DEMO · NO SIGN-UP</span><button class="iconbtn" data-act="demo-look" aria-label="Close">×</button></div>
+    <h2>${DEMO.hook}</h2><p>This is the real ${esc(PRODUCT.name)}, filled with ${DEMO.who}. Tap anything and change anything.</p>
+    <ul class="dw-perks">${DEMO.perks.map(([i,t])=>`<li><span class="mi" aria-hidden="true">${icon(i)}</span>${t}</li>`).join('')}</ul>
+    <div class="row-end"><button class="btn ghost" data-act="demo-look">Just look around</button><button class="btn coral" data-act="demo-tour">Show me in 60 seconds</button></div></div>`);
+}
+function demoGet(){
+  const unit=PROJ?'tasks':'spends';
+  openDlg(`<div class="dlg-head"><h2>Get the full ${esc(PRODUCT.name)}</h2><button class="iconbtn" data-act="close" aria-label="Close">×</button></div>
+    <p>Everything you tried here, made yours.</p>
+    <table class="dtable"><tr><th></th><th>Demo</th><th>Full</th></tr>
+      <tr><td>Every screen and feature</td><td>✓</td><td>✓</td></tr>
+      <tr><td>Your own ${unit}</td><td>${DEMO_LIMIT}</td><td>No limit</td></tr>
+      <tr><td>On your Home Screen, works offline</td><td>–</td><td>✓</td></tr>
+      <tr><td>Sync phone, tablet and computer</td><td>–</td><td>✓</td></tr>
+      <tr><td>Recovery key if you lose your phone</td><td>–</td><td>✓</td></tr></table>
+    <ul class="dt-why"><li>Pay once. No subscription and no account.</li><li>Your data stays on your own device.</li><li>Instant download from Etsy, with a step-by-step guide.</li></ul>
+    <div class="row-end"><button class="btn ghost" data-act="close">Keep trying the demo</button><a class="btn coral" href="${esc(PRODUCT.buy||PRODUCT.shop||'https://www.etsy.com/shop/StampbookApp')}" target="_blank" rel="noopener">Get it on Etsy</a></div>`);
+}
+function demoShow(i){
+  const s=DEMO.steps[i]; if(!s) return; closeDlg();
+  V.tab=s.go||'today'; render();
+  const el=s.focus||s.sel?document.querySelector(s.focus||s.sel):null;
+  if(!el){window.scrollTo(0,0); return}
+  if(s.val&&!el.value) el.value=s.val;
+  el.scrollIntoView({block:'center',behavior:'smooth'});
+  const box=s.focus?el.closest('form')||el:el; box.classList.remove('pulse'); void box.offsetWidth; box.classList.add('pulse');
+  if(s.focus) setTimeout(()=>el.focus({preventScroll:true}),350);
+}
+function demoAct(act,b){
+  switch(act){
+    case 'demo-get': demoGet(); return true;
+    case 'demo-look': closeDlg(); return true;
+    case 'demo-tour': closeDlg(); V.tab='today'; render(); window.scrollTo(0,0); setTimeout(()=>demoShow(0),300); return true;
+    case 'demo-show': demoShow(+b.dataset.i); return true;
+  }
+  return false;
+}
 /* ---------- boot ---------- */
 // installed copy (own https site, not embedded): Home Screen icon + offline cache
 if(!PRODUCT.demo&&window.top===window&&location.protocol==='https:'){
@@ -5204,6 +5331,8 @@ if(BUDGET) budgetBoot();
 if(PROJ) projBoot();
 render(); save();
 syncBoot();
+// first visit to the free demo: say what it is and offer the tour
+if(PRODUCT.demo&&S.sample&&!demoState().seen&&!/[?&]sbtest\b/.test(location.search)) setTimeout(demoWelcome,600);
 // tests open the page with ?sbtest to read the app's state
 if(/[?&]sbtest\b/.test(location.search)) window.__sb=c=>eval(c);
 })();
